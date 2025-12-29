@@ -87,6 +87,7 @@ http://127.0.0.1:8000
 ## Screenshot
 ### Create Page
 <img width="1118" height="801" alt="image" src="https://github.com/user-attachments/assets/5eeb7bff-8c2b-458c-b7a8-a7d227304d2b" />
+
 ### All Posts
 <img width="1298" height="375" alt="image" src="https://github.com/user-attachments/assets/e0b02ba9-598b-4d08-8911-de6ff80c1e70" />
 ---
