@@ -8,54 +8,80 @@ use App\Models\Post;
 class PostController extends Controller
 {
     /**
-     * Show form to create a new post
+     * Show Create Form
      */
     public function create()
     {
         return view('simple');
     }
-    
+
     /**
-     * Store a newly created post
+     * Store Post
      */
     public function store(Request $request)
     {
-        // Validate the request
         $request->validate([
-            'title' => 'required|string|max:255',
+            'title'   => 'required|string|max:255',
             'content' => 'required|string',
         ]);
-        
-        // Create the post
-        $post = Post::create([
-            'title' => $request->title,
+
+        Post::create([
+            'title'   => $request->title,
             'content' => $request->content,
         ]);
-        
-        // Redirect or return response
-        return redirect('/posts')->with('success', 'Post created successfully!');
-        // OR for JSON response:
-        // return response()->json([
-        //     'message' => 'Post created successfully',
-        //     'post' => $post
-        // ], 201);
+
+        return redirect()
+            ->route('posts.index')
+            ->with('success', 'Post created successfully.');
     }
-    
+
     /**
-     * Display all posts
+     * Display Posts
      */
-    public function index()
+    public function index(Request $request)
     {
-        $posts = Post::latest()->get();
-        return view('posts.index', compact('posts'));
+        $search = $request->search;
+
+        $posts = Post::when($search, function ($query) use ($search) {
+            $query->where('title', 'LIKE', "%{$search}%")
+                ->orWhere('content', 'LIKE', "%{$search}%");
+        })
+            ->oldest()
+            ->paginate(5)
+            ->withQueryString();
+
+        $totalPosts = Post::count();
+
+        $todayPosts = Post::whereDate('created_at', today())->count();
+
+        $latestPost = Post::latest()->first();
+
+        return view('posts.index', compact(
+            'posts',
+            'search',
+            'totalPosts',
+            'todayPosts',
+            'latestPost'
+        ));
     }
-    
+
     /**
-     * Display a single post
+     * Show Single Post
      */
-    public function show($id)
+    public function show(Post $post)
     {
-        $post = Post::findOrFail($id);
         return view('posts.show', compact('post'));
+    }
+
+    /**
+     * Delete Post
+     */
+    public function destroy(Post $post)
+    {
+        $post->delete();
+
+        return redirect()
+            ->route('posts.index')
+            ->with('success', 'Post deleted successfully.');
     }
 }
