@@ -23,11 +23,13 @@ class PostController extends Controller
         $request->validate([
             'title'   => 'required|string|max:255',
             'content' => 'required|string',
+            'status'  => 'required|in:Draft,Published',
         ]);
 
         Post::create([
             'title'   => $request->title,
             'content' => $request->content,
+            'status'  => $request->status,
         ]);
 
         return redirect()
@@ -41,12 +43,18 @@ class PostController extends Controller
     public function index(Request $request)
     {
         $search = $request->search;
+        $status = $request->status;
 
         $posts = Post::when($search, function ($query) use ($search) {
-            $query->where('title', 'LIKE', "%{$search}%")
-                ->orWhere('content', 'LIKE', "%{$search}%");
-        })
-            ->oldest()
+                $query->where(function ($q) use ($search) {
+                    $q->where('title', 'LIKE', "%{$search}%")
+                      ->orWhere('content', 'LIKE', "%{$search}%");
+                });
+            })
+            ->when($status, function ($query) use ($status) {
+                $query->where('status', $status);
+            })
+            ->latest()
             ->paginate(5)
             ->withQueryString();
 
@@ -54,13 +62,20 @@ class PostController extends Controller
 
         $todayPosts = Post::whereDate('created_at', today())->count();
 
+        $publishedPosts = Post::where('status', 'Published')->count();
+
+        $draftPosts = Post::where('status', 'Draft')->count();
+
         $latestPost = Post::latest()->first();
 
         return view('posts.index', compact(
             'posts',
             'search',
+            'status',
             'totalPosts',
             'todayPosts',
+            'publishedPosts',
+            'draftPosts',
             'latestPost'
         ));
     }
