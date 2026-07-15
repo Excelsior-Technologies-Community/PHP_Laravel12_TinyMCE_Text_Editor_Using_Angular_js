@@ -3,14 +3,23 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PostController;
 
-// Show form
-Route::get('/', [PostController::class, 'create'])->name('posts.create');
+/*
+|--------------------------------------------------------------------------
+| Web Routes
+|--------------------------------------------------------------------------
+*/
 
-// Handle form submission
-Route::post('/posts', [PostController::class, 'store'])->name('posts.store');
+Route::get('/', [PostController::class, 'create'])
+    ->name('posts.create');
 
-// Show all posts
-Route::get('/posts', [PostController::class, 'index'])->name('posts.index');
+Route::post('/posts', [PostController::class, 'store'])
+    ->name('posts.store');
 
-// Show single post
-Route::get('/posts/{id}', [PostController::class, 'show'])->name('posts.show');
+Route::get('/posts', [PostController::class, 'index'])
+    ->name('posts.index');
+
+Route::get('/posts/{post}', [PostController::class, 'show'])
+    ->name('posts.show');
+
+Route::delete('/posts/{post}', [PostController::class, 'destroy'])
+    ->name('posts.destroy');
