@@ -186,6 +186,32 @@
             border-color: #0d6efd;
         }
 
+        .status-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            color: #fff;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+
+        .status-published {
+            background: #198754;
+        }
+
+        .status-draft {
+            background: #ffc107;
+            color: #212529;
+        }
+
+        .status-filter {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            min-width: 170px;
+        }
+
         svg {
             width: 18px;
         }
@@ -241,6 +267,16 @@
             </div>
 
             <div class="card">
+                <h4>Published</h4>
+                <h2>{{ $publishedPosts }}</h2>
+            </div>
+
+            <div class="card">
+                <h4>Draft</h4>
+                <h2>{{ $draftPosts }}</h2>
+            </div>
+
+            <div class="card">
                 <h4>Latest Post</h4>
 
                 @if($latestPost)
@@ -269,6 +305,26 @@
                     placeholder="Search title or content..."
                     value="{{ request('search') }}">
 
+                <select
+                    name="status"
+                    class="status-filter">
+
+                    <option value="">All Status</option>
+
+                    <option
+                        value="Published"
+                        {{ request('status')=='Published' ? 'selected' : '' }}>
+                        Published
+                    </option>
+
+                    <option
+                        value="Draft"
+                        {{ request('status')=='Draft' ? 'selected' : '' }}>
+                        Draft
+                    </option>
+
+                </select>
+
                 <button type="submit">
                     Search
                 </button>
@@ -295,6 +351,20 @@
 
             <h3>{{ $post->title }}</h3>
 
+            @if($post->status == 'Published')
+
+            <span class="status-badge status-published">
+                Published
+            </span>
+
+            @else
+
+            <span class="status-badge status-draft">
+                Draft
+            </span>
+
+            @endif
+
             <div class="post-content">
 
                 {!! \Illuminate\Support\Str::limit($post->content,300) !!}
@@ -305,6 +375,21 @@
 
                 Created :
                 {{ $post->created_at->format('d M Y h:i A') }}
+
+                <br>
+
+                Status :
+                <strong>{{ $post->status }}</strong>
+
+                <br>
+
+                Words :
+                {{ str_word_count(strip_tags($post->content)) }}
+
+                <br>
+
+                Reading Time :
+                {{ max(1, ceil(str_word_count(strip_tags($post->content)) / 200)) }} min read
 
             </div>
 

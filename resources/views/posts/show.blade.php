@@ -36,10 +36,30 @@
             margin-bottom: 15px;
         }
 
+        .status-badge {
+            display: inline-block;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+
+        .status-published {
+            background: #198754;
+            color: #fff;
+        }
+
+        .status-draft {
+            background: #ffc107;
+            color: #212529;
+        }
+
         .meta {
             color: #777;
             margin-bottom: 25px;
             font-size: 14px;
+            line-height: 1.9;
         }
 
         .content {
@@ -120,13 +140,45 @@
 
             <h1>{{ $post->title }}</h1>
 
+            @if($post->status == 'Published')
+
+            <span class="status-badge status-published">
+                Published
+            </span>
+
+            @else
+
+            <span class="status-badge status-draft">
+                Draft
+            </span>
+
+            @endif
+
             <div class="meta">
-                <strong>Created:</strong>
-                {{ $post->created_at->format('d M Y h:i A') }}
+
+                <strong>Status :</strong>
+                {{ $post->status }}
+
                 <br><br>
 
-                <strong>Last Updated:</strong>
+                <strong>Created :</strong>
+                {{ $post->created_at->format('d M Y h:i A') }}
+
+                <br><br>
+
+                <strong>Last Updated :</strong>
                 {{ $post->updated_at->format('d M Y h:i A') }}
+
+                <br><br>
+
+                <strong>Words :</strong>
+                {{ str_word_count(strip_tags($post->content)) }}
+
+                <br><br>
+
+                <strong>Reading Time :</strong>
+                {{ max(1, ceil(str_word_count(strip_tags($post->content))/200)) }} min read
+
             </div>
 
             <hr>
